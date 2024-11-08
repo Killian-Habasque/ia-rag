@@ -4,7 +4,7 @@
 
 Ce projet démontre comment utiliser OpenAI pour générer des embeddings et Pinecone pour les stocker et effectuer des requêtes similaires basées sur des vecteurs.
 
-![rag image](https://github.com/Killian-Habasque/ia-rag/tree/main/public/rag.png)
+<img src="public/rag.png"/>
 
 ### Fonctionnalités
 
