@@ -1,34 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Pinecone } from "@pinecone-database/pinecone";
-import { upsertEmbeddingToPinecone } from "./api/pinecone/upsert";
 import { getEmbedding } from "./api/openai/getEmbedding";
+import { upsertEmbeddingToPinecone } from "./api/pinecone/upsert";
+import { queryPinecone } from "./api/pinecone/query";
 
-// Initialise Pinecone
-const pc = new Pinecone({
-  apiKey: `${process.env.NEXT_PUBLIC_PINECONE_API_KEY}`,
-});
 
 export default function Page() {
   const [input, setInput] = useState("");
   const [embedding, setEmbedding] = useState("");
   const [status, setStatus] = useState("");
+  const [results, setResults] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("");
+    setResults([]);
 
     try {
       const embeddingVector = await getEmbedding(input);
       setEmbedding(embeddingVector);
 
-      await upsertEmbeddingToPinecone(embeddingVector, input);
+      // await upsertEmbeddingToPinecone(embeddingVector, input);
+      // setStatus("Embedding inséré avec succès dans Pinecone !");
 
-      setStatus("Embedding inséré avec succès dans Pinecone !");
+      const similarItems = await queryPinecone(embeddingVector);
+      setResults(similarItems);
     } catch (error) {
       console.error("Erreur :", error);
-      setStatus("Une erreur est survenue lors de l'insertion dans Pinecone.");
+      setStatus("Une erreur est survenue.");
     }
   };
 
@@ -58,6 +58,22 @@ export default function Page() {
         </div>
       )}
       {status && <p className="mt-4 text-green-600">{status}</p>}
+      {results.length > 0 && (
+        <div className="mt-4 p-4 bg-gray-100 rounded shadow text-black w-full max-w-2xl">
+          <p className="mb-2 font-semibold">Résultats similaires :</p>
+          <ul className="list-disc pl-5">
+            {results.map((result, index) => (
+              <li key={index}>
+                <p><strong>ID:</strong> {result.id}</p>
+                <p><strong>Score:</strong> {result.score.toFixed(2)}</p>
+                {result.metadata?.text && (
+                  <p><strong>Texte:</strong> {result.metadata.text}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
