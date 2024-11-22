@@ -20,7 +20,7 @@ export const compareEmbedding = async (input, matches) => {
         
 
     `;
-    console.log(gptPrompt)
+
     try {
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
