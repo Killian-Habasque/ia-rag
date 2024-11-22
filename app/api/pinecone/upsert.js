@@ -5,7 +5,7 @@ const pc = new Pinecone({
 });
 
 export const upsertEmbeddingToPinecone = async (embeddingVector, input) => {
-    const index = pc.index("test");
+    const index = pc.index("ecv");
     await index.upsert([
         {
             id: `text-${Date.now()}`,
